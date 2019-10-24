@@ -1,0 +1,60 @@
+#This is the part where the visualization starts
+import numpy as np
+import pandas as pd
+import re
+import nltk
+
+#plotly
+from plotly import __version__
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+from chart_studio.grid_objs import Grid, Column
+import plotly.graph_objs as go
+import chart_studio.plotly as py
+from plotly import tools
+init_notebook_mode(connected = True)
+
+#LDA
+import pyLDAvis
+import pyLDAvis.gensim
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+stop = stopwords.words('english')
+pyLDAvis.enable_notebook()
+from gensim import corpora, models
+
+from scipy import stats
+
+import warnings
+warnings.filterwarnings('ignore')
+import plotly.offline as pyo
+pyo.init_notebook_mode()
+
+#not sure where to put this here for now
+twitter_tweets = pd.read_csv('tweets.csv')
+fake__users = pd.read_csv('users.csv')
+tweets_details = pd.read_csv('tweetdetails.csv')
+
+users = twitter_tweets.groupby('user_key', as_index = False).size().reset_index(name='retweet_count')
+users = users.sort_values('retweet_count', ascending = False).head(10)
+
+df = go.Bar(x = users['user_key'],y = users['retweet_count'],name='Top 10 Fake User Retweets')
+data = ([df])
+
+layout = go.Layout(
+    title = "",
+    yaxis = dict(
+        title = 'Number of Retweets',
+        titlefont=dict(
+            size=20,
+        )
+    ),
+    xaxis = dict(
+        title = 'Usernames',
+        titlefont=dict(
+            size=20,
+        )
+    )
+)
+
+fig = go.Figure(data=data, layout=layout)
+plot(fig, filename = 'retweet')
